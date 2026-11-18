@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Markaz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f3eee6; --surface:#ffffff; --text:#211c17; --muted:#8a8073;
+  --accent:#b8783a; --accent-strong:#8f5a22; --line:#e4dccc; --success:#4f7a5b;
+  --on-accent:#fdf8f0;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#15120f; --surface:#1e1a16; --text:#f0e9dd; --muted:#948a7b;
+    --accent:#d8a24c; --accent-strong:#f0b968; --line:#2b261f; --success:#6fa07c;
+    --on-accent:#1a1410;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#15120f; --surface:#1e1a16; --text:#f0e9dd; --muted:#948a7b;
+  --accent:#d8a24c; --accent-strong:#f0b968; --line:#2b261f; --success:#6fa07c;
+  --on-accent:#1a1410;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:'Inter',-apple-system,sans-serif;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+.serif{font-family:'Fraunces',serif}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+header{
+  padding:20px 22px 16px; display:flex; align-items:baseline; justify-content:space-between;
+  max-width:560px; margin:0 auto;
+}
+header .mark{font-family:'Fraunces',serif; font-weight:600; font-size:21px; font-style:italic}
+header .streak{font-size:14px; color:var(--accent-strong); font-weight:600}
+.wrap{max-width:560px; margin:0 auto; padding:4px 22px 104px}
+
+/* setup */
+.setup{padding-top:12vh}
+.setup .kicker{color:var(--muted); font-size:15px; margin:0 0 6px}
+.setup h2{font-family:'Fraunces',serif; font-weight:500; font-size:32px; line-height:1.25; margin:0 0 28px; max-width:16ch}
+textarea{
+  width:100%; padding:0 0 12px; border:none; border-bottom:2px solid var(--line);
+  background:transparent; color:var(--text); font-size:19px; font-family:'Fraunces',serif;
+  font-style:italic; resize:none;
+}
+textarea:focus{outline:none; border-color:var(--accent)}
+textarea::placeholder{color:var(--muted); opacity:.7}
+.go{
+  margin-top:26px; background:var(--accent); color:var(--on-accent); border:none;
+  border-radius:999px; padding:14px 26px; font-size:15px; font-weight:600; cursor:pointer;
+  display:inline-flex; align-items:center; gap:8px;
+}
+.go:disabled{opacity:.5}
+.status{color:var(--muted); font-size:14px; margin-top:14px; min-height:18px}
+
+/* hero today */
+.hero{padding:30px 0 6px}
+.hero .goal{color:var(--muted); font-size:14px; margin:0 0 10px}
+.hero .day{font-family:'Fraunces',serif; font-style:italic; color:var(--accent-strong); font-size:16px; margin:0 0 4px}
+.hero .task{font-family:'Fraunces',serif; font-weight:500; font-size:27px; line-height:1.35; margin:0 0 26px}
+.done-btn{
+  width:100%; background:var(--text); color:var(--bg); border:none; border-radius:14px;
+  padding:16px; font-size:16px; font-weight:600; cursor:pointer;
+}
+.done-btn.done{background:var(--success); color:#fff}
+.done-btn:disabled{opacity:.85; cursor:default}
+
+/* trail */
+.trail{margin-top:38px}
+.trail-head{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px}
+.trail-head h3{font-family:'Fraunces',serif; font-weight:500; font-size:17px; margin:0}
+.trail-head span{color:var(--muted); font-size:13px}
+.trail-row{display:flex; gap:16px; padding:13px 0; position:relative}
+.trail-row .stem{width:22px; display:flex; flex-direction:column; align-items:center; flex-shrink:0; position:relative}
+.trail-row .dot{width:22px; height:22px; border-radius:50%; border:2px solid var(--line); background:var(--bg); z-index:1; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:11px}
+.trail-row .dot.done{background:var(--accent); border-color:var(--accent); color:var(--on-accent)}
+.trail-row .dot.today{border-color:var(--accent-strong); border-width:3px}
+.trail-row .stem::after{content:""; position:absolute; top:22px; bottom:-13px; width:2px; background:var(--line)}
+.trail-row:last-child .stem::after{display:none}
+.trail-row .body{padding-top:1px}
+.trail-row .body .d{font-size:12px; color:var(--muted); margin-bottom:2px}
+.trail-row .body .t{font-size:15px; line-height:1.4}
+.trail-row.done .body .t{color:var(--muted); text-decoration:line-through; text-decoration-color:var(--line)}
+
+/* chat */
+.chat-wrap{padding-top:28px}
+.chat-wrap h3{font-family:'Fraunces',serif; font-weight:500; font-size:17px; margin:0 0 16px}
+.chat-area{display:flex; flex-direction:column; gap:10px; min-height:40vh}
+.msg{padding:12px 16px; border-radius:16px; font-size:15px; line-height:1.5; max-width:85%}
+.msg.user{background:var(--text); color:var(--bg); align-self:flex-end; border-bottom-right-radius:4px}
+.msg.ai{background:var(--surface); border:1px solid var(--line); align-self:flex-start; border-bottom-left-radius:4px}
+.chat-input-row{display:flex; gap:10px; margin-top:16px; align-items:center; border-top:1px solid var(--line); padding-top:14px}
+.chat-input-row input{
+  flex:1; border:none; background:transparent; color:var(--text); font-size:15px; font-family:inherit; padding:8px 0;
+}
+.chat-input-row input:focus{outline:none}
+.send{background:var(--accent); color:var(--on-accent); border:none; width:38px; height:38px; border-radius:50%; font-size:16px; cursor:pointer; flex-shrink:0}
+
+.reset{display:block; margin:34px auto 0; background:none; border:none; color:var(--muted); font-size:13px; text-decoration:underline; cursor:pointer}
+
+nav{
+  position:fixed; bottom:0; left:0; right:0; display:flex; justify-content:center; gap:6px;
+  padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px)); background:linear-gradient(to top, var(--bg) 60%, transparent);
+}
+nav .pill{display:flex; gap:6px; background:var(--surface); border:1px solid var(--line); border-radius:999px; padding:5px}
+nav button{
+  background:none; border:none; color:var(--muted); font-size:13px; font-weight:600; padding:9px 16px;
+  border-radius:999px; cursor:pointer; font-family:'Inter',sans-serif;
+}
+nav button.active{background:var(--text); color:var(--bg)}
+.hidden{display:none !important}
+</style>
+</head>
+<body>
+<header>
+  <span class="mark">Markaz</span>
+  <span class="streak" id="streakMini"></span>
+</header>
+
+<div class="wrap">
+
+  <div id="setupScreen" class="setup hidden">
+    <p class="kicker">Birinchi qadam</p>
+    <h2>Nimaga erishmoqchisiz?</h2>
+    <textarea id="goalInput" rows="2" placeholder="Masalan: Python dasturlashni o'rganmoqchiman..."></textarea>
+    <br>
+    <button class="go" id="genPlanBtn">Yo'lni boshlash →</button>
+    <div class="status" id="setupStatus"></div>
+  </div>
+
+  <div id="mainScreens" class="hidden">
+    <div id="taskScreen">
+      <div class="hero">
+        <p class="goal" id="goalLine"></p>
+        <p class="day" id="dayTitle"></p>
+        <h2 class="task" id="taskText"></h2>
+        <button class="done-btn" id="doneBtn">Bajardim</button>
+        <p id="motivLine" style="color:var(--accent-strong); font-size:14px; margin-top:12px; font-weight:600"></p>
+      </div>
+      <div class="trail">
+        <div class="trail-head"><h3>Yo'lingiz</h3><span id="progressText"></span></div>
+        <div id="trailList"></div>
+      </div>
+    </div>
+
+    <div id="chatScreen" class="hidden chat-wrap">
+      <h3>AI bilan suhbat</h3>
+      <div class="chat-area" id="chatArea"></div>
+      <div class="chat-input-row">
+        <input type="text" id="chatInput" placeholder="Savolingizni yozing...">
+        <button class="send" id="chatSendBtn">↑</button>
+      </div>
+    </div>
+
+    <button class="reset" id="resetBtn">Yangi maqsad qo'yish</button>
+  </div>
+</div>
+
+<nav id="bottomNav" class="hidden">
+  <div class="pill">
+    <button data-tab="taskScreen" class="active">Yo'l</button>
+    <button data-tab="chatScreen">Suhbat</button>
+  </div>
+</nav>
+
+<script>
+const GEMINI_API_KEY = "AQ.Ab8RN6KwoH_df1U3mevMqjPcwZ1vgGBdgWyoC9Y0O0dF64CVHw";
+const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + GEMINI_API_KEY;
+let state = { goal: null, plan: [], completedDays: [], currentDay: 1 };
+
+async function callGemini(promptText){
+  const res = await fetch(GEMINI_URL, {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }] })
+  });
+  const data = await res.json();
+  return data.candidates[0].content.parts[0].text;
+}
+
+async function initCapabilities(){ /* Gemini uchun kerak emas */ }
+function loadState(){
+  try{
+    const raw = localStorage.getItem('markaz_state');
+    if(raw) state = JSON.parse(raw);
+  }catch(e){}
+}
+function saveState(){
+  try{ localStorage.setItem('markaz_state', JSON.stringify(state)); }catch(e){}
+}
+
+function render(){
+  if(!state.goal){
+    document.getElementById('setupScreen').classList.remove('hidden');
+    document.getElementById('mainScreens').classList.add('hidden');
+    document.getElementById('bottomNav').classList.add('hidden');
+    return;
+  }
+  document.getElementById('setupScreen').classList.add('hidden');
+  document.getElementById('mainScreens').classList.remove('hidden');
+  document.getElementById('bottomNav').classList.remove('hidden');
+
+  document.getElementById('goalLine').textContent = state.goal;
+  const total = state.plan.length;
+  const idx = Math.min(state.currentDay - 1, total - 1);
+  const task = state.plan[idx] || "Reja tugadi — tabriklaymiz!";
+  document.getElementById('dayTitle').textContent = total ? ("Kun " + state.currentDay + " / " + total) : "";
+  document.getElementById('taskText').textContent = task;
+
+  const streak = state.completedDays.length;
+  document.getElementById('streakMini').textContent = streak ? (streak + " kun") : "";
+  document.getElementById('progressText').textContent = streak + " / " + total + " bajarildi";
+
+  const motivLines = [
+    "Zo'r, Dilafruz!", "Shunday davom et, Dilafruz!", "Dilafruz, sen buni uddalaysan!",
+    "Ajoyib qadam, Dilafruz!", "Dilafruz, har kun seni maqsadga yaqinlashtiryapti!"
+  ];
+  const motivBox = document.getElementById('motivLine');
+  if(motivBox) motivBox.textContent = streak > 0 ? motivLines[streak % motivLines.length] : "Boshlaymizmi, Dilafruz?";
+
+  const doneToday = state.completedDays.includes(state.currentDay);
+  const finished = state.currentDay > total;
+  document.getElementById('doneBtn').disabled = doneToday || finished;
+  document.getElementById('doneBtn').className = 'done-btn' + (doneToday ? ' done' : '');
+  document.getElementById('doneBtn').textContent = doneToday ? "Bugun bajarilgan ✓" : (finished ? "Reja tugadi" : "Bajardim");
+  if(doneToday){
+    const cheer = ["Zo'r, Dilafruz! 🔥", "Ajoyib, Dilafruz!", "Dilafruz, davom et shunday!"];
+    document.getElementById('motivLine').textContent = cheer[streak % cheer.length];
+  }
+
+  const trail = document.getElementById('trailList');
+  trail.innerHTML = '';
+  state.plan.forEach((t,i)=>{
+    const day = i+1;
+    const done = state.completedDays.includes(day);
+    const today = day === state.currentDay && !done;
+    const row = document.createElement('div');
+    row.className = 'trail-row' + (done ? ' done' : '');
+    row.innerHTML =
+      '<div class="stem"><div class="dot '+(done?'done':'')+' '+(today?'today':'')+'">'+(done?'✓':'')+'</div></div>'+
+      '<div class="body"><div class="d">Kun '+day+'</div><div class="t">'+t+'</div></div>';
+    trail.appendChild(row);
+  });
+}
+
+async function generatePlan(){
+  const goal = document.getElementById('goalInput').value.trim();
+  if(!goal) return;
+  const status = document.getElementById('setupStatus');
+  const btn = document.getElementById('genPlanBtn');
+  btn.disabled = true; status.textContent = "Yo'lingiz chizilmoqda...";
+
+  let plan = [];
+  try{
+    const prompt = "Foydalanuvchining maqsadi: \""+goal+"\". Shu maqsad uchun 7 kunlik reja tuz. MUHIM QOIDA: qiyinlik darajasi asta-sekin oshib borishi kerak \u2014 1-kun juda sodda, hatto 5 daqiqada bajarsa bo'ladigan, yangi boshlovchiga qo'rqinchli bo'lmaydigan vazifa bo'lsin; 2-3-kun biroz kengroq; 4-5-kun amaliy mashq; 6-7-kun eng murakkab, lekin baribir bitta kunda bajarish mumkin bo'lgan vazifa. Har bir kun uchun bitta qisqa jumla (10-15 so'z). Faqat shu formatda javob ber, boshqa hech narsa yozma:\n1. ...\n2. ...\n...\n7. ...";
+    const text = await callGemini(prompt);
+    const lines = text.split("\n").map(l=>l.trim()).filter(l=>/^\d+[\.\)]/.test(l));
+    plan = lines.map(l=>l.replace(/^\d+[\.\)]\s*/, '')).filter(Boolean);
+  }catch(e){}
+  if(plan.length < 3){
+    plan = [
+      goal + " haqida 5 daqiqa eng oddiy ma'lumotni o'qing — shunchaki tanishib chiqing",
+      "Kecha o'rganganingizni 2-3 jumlada o'zingizga aytib bering",
+      "Birinchi juda kichik mashqni bajaring (10 daqiqa)",
+      "Biroz kengroq mashq qiling va bitta qiyin savolga javob toping (20 daqiqa)",
+      "Amaliy mashq qiling va o'rganganingizni kichik misolga qo'llang (25 daqiqa)",
+      "Qiyinroq, ko'proq fikrlashni talab qiladigan vazifani bajaring",
+      "Kichik yakuniy loyiha yoki haftalik sarhisob tayyorlang"
+    ];
+  }
+
+  state = { goal, plan, completedDays: [], currentDay: 1 };
+  await saveState();
+  status.textContent = "";
+  btn.disabled = false;
+  render();
+}
+
+function markDone(){
+  if(!state.completedDays.includes(state.currentDay)){
+    state.completedDays.push(state.currentDay);
+  }
+  if(state.currentDay < state.plan.length) state.currentDay++;
+  saveState();
+  render();
+}
+
+function addChatMsg(text, who){
+  const area = document.getElementById('chatArea');
+  const div = document.createElement('div');
+  div.className = 'msg ' + who;
+  div.textContent = text;
+  area.appendChild(div);
+  area.scrollTop = area.scrollHeight;
+}
+
+async function sendChat(){
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if(!text) return;
+  input.value = '';
+  addChatMsg(text, 'user');
+  const thinking = document.createElement('div');
+  thinking.className = 'msg ai';
+  thinking.textContent = '···';
+  document.getElementById('chatArea').appendChild(thinking);
+  try{
+    const prompt = "Foydalanuvchining maqsadi: "+(state.goal||"noma'lum")+". Savoli: "+text+". O'zbek tilida, qisqa va tushunarli javob ber.";
+    thinking.textContent = await callGemini(prompt);
+  }catch(e){
+    thinking.textContent = "Xatolik yuz berdi, qayta urinib ko'ring.";
+  }
+}
+
+document.getElementById('genPlanBtn').addEventListener('click', generatePlan);
+document.getElementById('doneBtn').addEventListener('click', markDone);
+document.getElementById('chatSendBtn').addEventListener('click', sendChat);
+document.getElementById('chatInput').addEventListener('keydown', e=>{ if(e.key==='Enter') sendChat(); });
+document.getElementById('resetBtn').addEventListener('click', async ()=>{
+  state = { goal: null, plan: [], completedDays: [], currentDay: 1 };
+  await saveState();
+  document.getElementById('goalInput').value = '';
+  render();
+});
+document.querySelectorAll('#bottomNav button').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    document.querySelectorAll('#bottomNav button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    ['taskScreen','chatScreen'].forEach(id=>{
+      document.getElementById(id).classList.toggle('hidden', id !== b.dataset.tab);
+    });
+  });
+});
+
+(async ()=>{
+  await initCapabilities();
+  await loadState();
+  render();
+})();
+</script>
+</body>
+</html>
