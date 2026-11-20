@@ -175,13 +175,13 @@ nav button.active{background:var(--text); color:var(--bg)}
 
 <script>
 const GEMINI_API_KEY = "AQ.Ab8RN6KwoH_df1U3mevMqjPcwZ1vgGBdgWyoC9Y0O0dF64CVHw";
-const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + GEMINI_API_KEY;
+const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
 let state = { goal: null, plan: [], completedDays: [], currentDay: 1 };
 
 async function callGemini(promptText){
   const res = await fetch(GEMINI_URL, {
     method: "POST",
-    headers: {"Content-Type":"application/json"},
+    headers: {"Content-Type":"application/json", "x-goog-api-key": GEMINI_API_KEY},
     body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }] })
   });
   const data = await res.json();
